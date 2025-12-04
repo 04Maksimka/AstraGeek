@@ -24,15 +24,3 @@ class StereoProjector(object):
     def generate(self) -> None:
         """Generate a projection."""
         raise NotImplemented
-
-
-def main():
-    """Main function."""
-
-    # test catalog print
-    catalog = Catalog()
-    data = catalog.get_data()
-    print(data)
-
-if __name__ == "__main__":
-    main()

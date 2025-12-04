@@ -11,10 +11,6 @@ class EquatorialCoords(object):
     right_ascension: float
     declination: float
 
-    def __init__(self, right_ascension: float, declination: float):
-        self.right_ascension = right_ascension
-        self.declination = declination
-
     def __repr__(self):
         return f'(alpha:{np.rad2deg(self.right_ascension):8.2f}, delta:{np.rad2deg(self.declination):8.2f})'
 
@@ -27,11 +23,6 @@ class ECICoords(object):
     y: float
     z: float
 
-    def __init__(self, x: float, y: float, z: float):
-        self.x = x
-        self.y = y
-        self.z = z
-
     def __repr__(self):
         return f'(x: {self.x:6.2f}, y: {self.y:6.2f}, z: {self.z:6.2f})'
 
@@ -42,19 +33,17 @@ class Star(object):
 
     v_mag: float                    # visual magnitude
     eq_coords: EquatorialCoords     # equatorial coordinates (alpha, delta)
-    eci_coords: ECICoords           # eci coordinates (x, y, z)
+    eci_coords: ECICoords = None    # eci coordinates (x, y, z)
 
 
-    def __init__(self, v_mag: float, right_ascension: float, declination: float):
-        self.eq_coords = EquatorialCoords(right_ascension=right_ascension,
-                                          declination=declination)
-        self.init_eci()
-        self.v_mag = v_mag
+    def __post_init__(self):
+        self.eci_coords = self.eci
 
     def __repr__(self):
         return f'eq={self.eq_coords}, eci={self.eci_coords}, m={self.v_mag:7.2f}'
 
-    def init_eci(self):
+    @property
+    def eci(self):
         """Initialize ECI coordinates."""
         # short names for usage
         alpha = self.eq_coords.right_ascension
@@ -65,47 +54,56 @@ class Star(object):
         y = np.sin(alpha) * np.cos(delta)
         z = np.sin(delta)
 
-        self.eci_coords = ECICoords(x=x, y=y, z=z)
+        assert abs(x ** 2 + y ** 2 + z ** 2 - 1) < 1e-15
+
+        return ECICoords(x=x, y=y, z=z)
 
 
 @dataclass
 class Catalog(object):
-    """Hipparchus catalog."""
+    """
+    Hipparchus catalog parsing.
+
+    TODO: correct data import, path is need to be relative to the module, not to a main
+    """
 
     mag_criteria: float = 5.5
-    catalog_path: str = './hip_catalog/hip_data.tsv'
+    catalog_path: str = './hip_data.tsv'
 
     def get_data(self) -> NDArray[Star]:
         """
         Returns list of stars with given constrains.
-
-        TODO: add correct type assigning in the data array
         """
 
         # read data from file
-        raw_data = np.genfromtxt(self.catalog_path, delimiter=';',
+        raw_data = np.genfromtxt(fname=self.catalog_path, delimiter=';',
                                  dtype=None,
                                  names=True,
                                  encoding='utf-8',
                                  missing_values='',
                                  filling_values=None)
 
-        # masking stars with missing coordinates
-        mask = []
-        for row in raw_data:
-            if (row['_RAJ2000'] is not None and row['_RAJ2000'] != '') \
-                    and (row['_DEJ2000'] is not None and row['_DEJ2000'] != ''):
-                mask.append(True)
-            else:
-                mask.append(False)
+        raw_data = raw_data[1:]     # without units
+        mask = (raw_data['_RAJ2000'] != '') & (raw_data['_DEJ2000'] != '')
         clean_data = raw_data[mask]
 
-        # make NDarray of Stars
+        # make numpy array of Stars
         data = np.array([
             Star(v_mag=float(line['Vmag']),
-                 right_ascension=np.deg2rad(float(line['_RAJ2000'])),
-                 declination=np.deg2rad(float(line['_DEJ2000'])))
-            for line in clean_data[1:]
+                 eq_coords=EquatorialCoords(right_ascension=np.deg2rad(float(line['_RAJ2000'])),
+                                            declination=np.deg2rad(float(line['_DEJ2000']))))
+            for line in clean_data
         ], dtype=Star)
 
         return data
+
+def main():
+    """Main function."""
+
+    # test catalog print
+    catalog = Catalog()
+    data = catalog.get_data()
+    print(data)
+
+if __name__ == "__main__":
+    main()
