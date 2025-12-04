@@ -6,6 +6,7 @@ import numpy as np
 
 @dataclass
 class EquatorialCoords(object):
+    """Data class of equatorial coordinates."""
 
     right_ascension: float
     declination: float
@@ -15,11 +16,12 @@ class EquatorialCoords(object):
         self.declination = declination
 
     def __repr__(self):
-        return f'(alpha:{np.rad2deg(self.right_ascension):10.4f}, delta:{np.rad2deg(self.declination):10.4f})'
+        return f'(alpha:{np.rad2deg(self.right_ascension):8.2f}, delta:{np.rad2deg(self.declination):8.2f})'
 
 
 @dataclass
 class ECICoords(object):
+    """Data class of ECI coordinates."""
 
     x: float
     y: float
@@ -31,7 +33,7 @@ class ECICoords(object):
         self.z = z
 
     def __repr__(self):
-        return f'(x: {self.x:7.4f}, y: {self.y:7.4f}, z: {self.z:7.4f})'
+        return f'(x: {self.x:6.2f}, y: {self.y:6.2f}, z: {self.z:6.2f})'
 
 
 @dataclass
@@ -50,7 +52,7 @@ class Star(object):
         self.v_mag = v_mag
 
     def __repr__(self):
-        return f'eq={self.eq_coords}, eci={self.eci_coords}, m={self.v_mag}'
+        return f'eq={self.eq_coords}, eci={self.eci_coords}, m={self.v_mag:7.2f}'
 
     def init_eci(self):
         """Initialize ECI coordinates."""
