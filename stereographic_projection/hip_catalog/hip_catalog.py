@@ -91,8 +91,8 @@ class Catalog(object):
         # masking stars with missing coordinates
         mask = []
         for row in raw_data:
-            if row['_RAJ2000'] is not None and row['_RAJ2000'] != '' \
-                    or row['_DEJ2000'] is not None and row['_DEJ2000'] != '':
+            if (row['_RAJ2000'] is not None and row['_RAJ2000'] != '') \
+                    and (row['_DEJ2000'] is not None and row['_DEJ2000'] != ''):
                 mask.append(True)
             else:
                 mask.append(False)
