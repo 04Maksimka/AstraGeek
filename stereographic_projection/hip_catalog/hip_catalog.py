@@ -14,7 +14,7 @@ class EquatorialCoords(object):
 
     def __repr__(self):
         return f'(alpha:{np.rad2deg(self.right_ascension):8.2f}, ' \
-               'delta:{np.rad2deg(self.declination):8.2f})'
+               f'delta:{np.rad2deg(self.declination):8.2f})'
 
 
 @dataclass
