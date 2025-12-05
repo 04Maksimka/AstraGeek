@@ -13,7 +13,8 @@ class EquatorialCoords(object):
     declination: float
 
     def __repr__(self):
-        return f'(alpha:{np.rad2deg(self.right_ascension):8.2f}, delta:{np.rad2deg(self.declination):8.2f})'
+        return f'(alpha:{np.rad2deg(self.right_ascension):8.2f}, ' \
+               'delta:{np.rad2deg(self.declination):8.2f})'
 
 
 @dataclass
@@ -86,17 +87,17 @@ class Catalog(object):
         # make numpy array of Stars
         data = np.array(
             [
-                Star(v_mag=float(line['Vmag']),
-                     eq_coords=EquatorialCoords(
-                         right_ascension=np.deg2rad(float(line['_RAJ2000'])),
-                         declination=np.deg2rad(float(line['_DEJ2000']))
-                     )
+                Star(
+                    v_mag=float(line['Vmag']),
+                    eq_coords=EquatorialCoords(
+                        right_ascension=np.deg2rad(float(line['_RAJ2000'])),
+                        declination=np.deg2rad(float(line['_DEJ2000']))
+                    )
                 )
                 for line in cleaned_data
             ],
             dtype=Star
         )
-
         return data
 
     @staticmethod
