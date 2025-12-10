@@ -67,6 +67,7 @@ class Catalog(object):
     def parse_data(self) -> NDArray[Star]:
         """
         Returns list of stars with given constrains.
+        TODO: implement caching and applying constrains
         """
 
         catalog_path = pathlib.Path(__file__).parent.absolute() / self.catalog_name
