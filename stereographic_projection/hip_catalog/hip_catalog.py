@@ -28,6 +28,10 @@ class ECICoords(object):
     def __repr__(self):
         return f'(x: {self.x:6.2f}, y: {self.y:6.2f}, z: {self.z:6.2f})'
 
+    def __iter__(self):
+        for value in self.__dict__.values():
+            yield value
+
 
 @dataclass
 class Star(object):

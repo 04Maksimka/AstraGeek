@@ -1,11 +1,11 @@
 """Module implementing main stereographic projection."""
 from dataclasses import dataclass
 from datetime import datetime
+import dateutil.tz
 from numpy.typing import NDArray
 import numpy as np
 from matplotlib import pyplot as plt
-from stereographic_projection.helpers.pdf_helpers.figure2pdf import save_figure
-from stereographic_projection.hip_catalog.hip_catalog import Catalog, Star
+from stereographic_projection.hip_catalog.hip_catalog import Catalog, Star, ECICoords
 
 
 @dataclass
@@ -16,6 +16,10 @@ class StereoProjConfig(object):
     utc_time: datetime
     latitude: float
     longitude: float
+
+    def __post_init__(self):
+        self.latitude *= np.pi / 180.0
+        self.longitude *= np.pi / 180.0
 
 
 @dataclass
@@ -36,7 +40,12 @@ class StarView(object):
 
 @dataclass
 class PointProjection(object):
-    """Class of point projection."""
+    """
+    Class of point projection.
+    radius: star image circle radius
+    phi: star image azimuth
+    rho: star image polar radius
+    """
 
     radius : float
     rho: float
@@ -50,19 +59,21 @@ class StereoProjector(object):
         self.config = config
         self.catalog = catalog
 
-    def generate(self, need_pdf=False) -> NDArray[PointProjection]:
+    def generate(self) -> plt.Figure:
         """
         Generate a projection.
         """
 
-        # get catalog
-        catalog_data = catalog.parse_data()
-        # from equatorial to horizontal
+        # Get catalog
+        catalog_data = self.catalog.parse_data()
+        # From equatorial to horizontal
         star_view_data = self._make_star_views(catalog_data)
-        # make projections
+        # Make projections
         points_data = self._make_point_projections(star_view_data)
+        # Make figure with projections
+        fig, _ = self._create_polar_scatter(points_data)
 
-        self._stars_with_logo(points_data)
+        return fig
 
     def _make_point_projections(self, star_view_data: NDArray[StarView]) -> NDArray[PointProjection]:
         """
@@ -81,30 +92,55 @@ class StereoProjector(object):
                     phi=star_view.hor_coords.azimuth
                 )
                 for star_view in star_view_data
-                if star_view.hor_coords.zenith_dist < np.pi / 2
+                if star_view.hor_coords.zenith_dist <= np.pi / 2
             ]
         )
         return points_data
 
-    @staticmethod
-    def _make_star_views(catalog_data: NDArray[Star]) -> NDArray[StarView]:
+    def _make_star_views(self, catalog_data: NDArray[Star]) -> NDArray[StarView]:
         """
         Returns horizontal coordinates.
         :param catalog_data: catalog of the stars
         :return: star view parameters
 
-        TODO: implement equatorial using config parameters (longitude, latitude and local time)
+        TODO: it's awful, but working, need to refactor. need to calculate sidereal_time accurately
         """
+
+        eci_coords = [star.eci_coords for star in catalog_data]
+
+        # Shift from UTC
+        timeshift = self.config.longitude * 3600 / 15.0
+
+        # Just time from 1970-1-1
+        sidereal_time = self.config.utc_time.replace(tzinfo=dateutil.tz.tzoffset(None, timeshift)).timestamp() * np.pi / (12 * 3600)
+
+        # Rotate ECI (XYZ) to "cartesian" equatorial system (X'Y'Z'),
+        # so Z' is directed to the North celestial pole, X' --- to the West point
+        latitude = self.config.latitude
+        rotation_matrix = np.array(
+            [
+                [np.sin(sidereal_time), np.sin(latitude) * np.cos(sidereal_time), -np.cos(latitude) * np.cos(sidereal_time)],
+                [-np.cos(sidereal_time), np.sin(latitude) * np.sin(sidereal_time), -np.cos(latitude) * np.sin(sidereal_time)],
+                [0.0, np.cos(latitude), np.sin(latitude)]
+            ]
+        )
+        cartesian_hor_coords = np.array([rotation_matrix @ np.array(list(eci_coord)) for eci_coord in eci_coords])
+
+        # 0, 1, 2 is x, y, z below
+        azimuths = -np.atan2(cartesian_hor_coords[:, 1], cartesian_hor_coords[:, 0])
+        zeniths = np.arccos(cartesian_hor_coords[:, 2])
+        magnitudes = np.array([star.v_mag for star in catalog_data])
+
         star_view_data = np.array(
             [
                 StarView(
-                    v_mag=star.v_mag,
+                    v_mag=m,
                     hor_coords=HorizontalCoords(
-                        zenith_dist=(np.pi / 2 - star.eq_coords.declination),
-                        azimuth=star.eq_coords.right_ascension
+                        zenith_dist=z,
+                        azimuth=a
                     )
                 )
-                for star in catalog_data
+                for m, z, a in zip(magnitudes, zeniths, azimuths)
             ]
         )
         return star_view_data
@@ -118,38 +154,22 @@ class StereoProjector(object):
 
         TODO: implement this function
         """
-        return 8 - magnitude
 
-    def _stars_with_logo(self, data: NDArray[PointProjection], need_pdf: bool = False):
-        """Example with local logo file."""
-        # Create polar scatter plot
-        fig, ax = self._create_polar_scatter(data)
+        return np.max([6 - magnitude, 0])
 
-        # Footer text
-        footer = "© 2025 AstraGeek. All rights reserved."
-
-        if need_pdf:
-            save_figure(
-                fig=fig,
-                filename="polar_scatter_local_logo.pdf",
-                logo_path="logo_astrageek.png",
-                footer_text=footer,
-                logo_position=(0.15, 0.97),
-                text_position=(0.5, 0.01),
-            )
-
-        plt.show()
-
-    def _create_polar_scatter(self, data: NDArray[PointProjection]):
+    @staticmethod
+    def _create_polar_scatter(data: NDArray[PointProjection]):
         """Create a scatter plot in polar coordinates."""
         # Set up the figure with polar projection
-        fig = plt.figure(figsize=(10, 8))
+        fig = plt.figure(figsize=(15, 12))
         ax = fig.add_subplot(111, projection='polar')
 
-        sizes = [2 * point.radius for point in data]
+        # Get parameters from projections data array
+        sizes = [point.radius for point in data]
         phi = [point.phi for point in data]
         rho = [point.rho for point in data]
 
+        # Make scatter
         ax.scatter(
             phi,
             rho,
@@ -160,17 +180,11 @@ class StereoProjector(object):
             linewidth=0.5,
         )
 
-        ax.set_title("Polar Scatter Plot", va='bottom', fontsize=14, pad=20)
-        ax.set_xlabel("Angle (θ)", labelpad=15)
+        ax.set_title("Skychart", va='bottom', fontsize=14, pad=20)
+        # ax.set_xlabel("Angle (θ)", labelpad=15)
         ax.grid(False)
+        ax.set_xticks([])
         ax.set_yticks([])
+        ax.set_ylim((0.0, 2.0))
 
         return fig, ax
-
-
-if __name__ == "__main__":
-    cfg = StereoProjConfig(add_ecliptic=True, utc_time=datetime(2021, 3, 1), latitude=55, longitude=-70)
-    catalog = Catalog()
-    proj = StereoProjector(cfg, catalog)
-
-    proj.generate()
