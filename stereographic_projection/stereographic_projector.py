@@ -33,6 +33,7 @@ class StereoProjector(object):
     def generate(self) -> plt.Figure:
         """
         Generate a projection.
+        :return: figure
         """
 
         # Get catalog
@@ -53,6 +54,7 @@ class StereoProjector(object):
         :param catalog_data: catalog of the stars
         :return: star view parameters
         """
+
         _, azimuths, zeniths = get_horizontal_coords(self.config.__dict__, catalog_data=catalog_data)
 
         magnitudes = np.array([star.v_mag for star in catalog_data])
@@ -75,7 +77,11 @@ class StereoProjector(object):
 
     @staticmethod
     def _create_polar_scatter(data: NDArray[PointProjection]):
-        """Create a scatter plot in polar coordinates."""
+        """
+        Create a scatter plot in polar coordinates.
+        :param data: projection points to place on figure
+        """
+
         # Set up the figure with polar projection
         fig = plt.figure(figsize=(15, 12))
         ax = fig.add_subplot(111, projection='polar')
@@ -98,7 +104,7 @@ class StereoProjector(object):
 
         ax.set_title("Skychart", va='bottom', fontsize=14, pad=20)
         ax.set_xlabel("Angle (θ)", labelpad=15)
-        ax.grid(False)
+        ax.grid(True)
         # ax.set_xticks([])
         ax.set_yticks([])
         ax.set_ylim((0.0, 2.0))

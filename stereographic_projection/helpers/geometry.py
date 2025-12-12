@@ -43,9 +43,9 @@ def get_horizontal_coords(config: dict, catalog_data: NDArray[Star]):
     :param config: place configuration
     :param catalog_data: star catalog data
     :return: horizontal coordinates, zenith distances and azimuths
-
-    TODO: implement accurate sidereal time calculation
     """
+
+    # Get ECI star coordinates
     eci_coords = np.array([np.array(list(star.eci_coords)) for star in catalog_data]).T
 
     # Calculate local sidereal time
@@ -57,19 +57,21 @@ def get_horizontal_coords(config: dict, catalog_data: NDArray[Star]):
     # Rotate ECI (XYZ) to "cartesian" equatorial system (X'Y'Z'),
     # so Z' is directed to the North celestial pole, X' --- to the West point
     latitude = config['latitude']
+    sl = np.sin(latitude)
+    cl = np.cos(latitude)
+    st = np.sin(sidereal_time)
+    ct = np.cos(sidereal_time)
     rotation_matrix = np.array(
         [
-            [np.sin(sidereal_time), np.sin(latitude) * np.cos(sidereal_time),
-             -np.cos(latitude) * np.cos(sidereal_time)],
-            [-np.cos(sidereal_time), np.sin(latitude) * np.sin(sidereal_time),
-             -np.cos(latitude) * np.sin(sidereal_time)],
-            [0.0, np.cos(latitude), np.sin(latitude)]
+            [st, -ct, 0],
+            [sl * ct, sl * st, -cl],
+            [cl * ct, cl * st, sl]
         ]
     )
     cartesian_hor_coords = rotation_matrix @ eci_coords
 
     # 0, 1, 2 is x, y, z below
-    azimuths = -np.atan2(cartesian_hor_coords[1, :], cartesian_hor_coords[0, :])
+    azimuths = np.atan2(cartesian_hor_coords[0, :], cartesian_hor_coords[1, :]) - np.pi / 2
     zeniths = np.arccos(cartesian_hor_coords[2, :])
 
     return cartesian_hor_coords, azimuths, zeniths
@@ -82,7 +84,7 @@ def mag_to_radius(magnitude: float, mag_criteria: float) -> float:
     :param mag_criteria: max radius criteria
     :return: radius: star image radius
     """
-    return np.max([mag_criteria - magnitude, 0])
+    return 1.5*np.max([mag_criteria - magnitude, 0])
 
 
 def make_point_projections(star_view_data: NDArray[StarView], mag_criteria: float) -> NDArray[PointProjection]:

@@ -26,13 +26,17 @@ if __name__ == "__main__":
     cfg = StereoProjConfig(
         add_ecliptic=True,
         local_time=datetime(
-            year=2021,
-            month=3,
+            year=2025,
+            month=9,
             day=1,
-            hour=12
+            hour=22,
+            minute=20,
+            second=40
         ),
-        latitude=45,
-        longitude=90)
+        latitude=-21.1111,
+        longitude=125.926
+    )
+
     catalog = Catalog()
     proj = StereoProjector(cfg, catalog)
 
