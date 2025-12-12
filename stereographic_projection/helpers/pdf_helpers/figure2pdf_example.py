@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 from stereographic_projection.helpers.pdf_helpers.figure2pdf import save_figure
 
 
-def example_with_local_logo():
+def example_with_local_logo(need_pdf=False):
     """Example with local logo file."""
     # Create polar scatter plot
     fig, ax = _create_polar_scatter()
@@ -13,14 +13,15 @@ def example_with_local_logo():
     # Footer text
     footer = "© 2025 AstraGeek. All rights reserved."
 
-    save_figure(
-        fig=fig,
-        filename="polar_scatter_local_logo.pdf",
-        logo_path="logo_astrageek.png",
-        footer_text=footer,
-        logo_position=(0.15, 0.97),
-        text_position=(0.5, 0.01),
-    )
+    if need_pdf:
+        save_figure(
+            fig=fig,
+            filename="polar_scatter_local_logo.pdf",
+            logo_path="logo_astrageek.png",
+            footer_text=footer,
+            logo_position=(0.15, 0.97),
+            text_position=(0.5, 0.01),
+        )
 
     plt.show()
 

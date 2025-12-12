@@ -28,6 +28,10 @@ class ECICoords(object):
     def __repr__(self):
         return f'(x: {self.x:6.2f}, y: {self.y:6.2f}, z: {self.z:6.2f})'
 
+    def __iter__(self):
+        for att in ['x', 'y', 'z']:
+            yield getattr(self, att)
+
 
 @dataclass
 class Star(object):
@@ -67,6 +71,7 @@ class Catalog(object):
     def parse_data(self) -> NDArray[Star]:
         """
         Returns list of stars with given constrains.
+        TODO: implement caching and applying constrains
         """
 
         catalog_path = pathlib.Path(__file__).parent.absolute() / self.catalog_name
