@@ -29,8 +29,8 @@ class ECICoords(object):
         return f'(x: {self.x:6.2f}, y: {self.y:6.2f}, z: {self.z:6.2f})'
 
     def __iter__(self):
-        for value in self.__dict__.values():
-            yield value
+        for att in ['x', 'y', 'z']:
+            yield getattr(self, att)
 
 
 @dataclass
