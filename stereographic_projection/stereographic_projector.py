@@ -1,7 +1,6 @@
 """Module implementing main stereographic projection."""
 from dataclasses import dataclass
 from datetime import datetime
-import dateutil.tz
 from numpy.typing import NDArray
 import numpy as np
 from matplotlib import pyplot as plt
@@ -14,7 +13,7 @@ class StereoProjConfig(object):
     """Class of configuration of the StereoProjector."""
 
     add_ecliptic: bool
-    utc_time: datetime
+    local_time: datetime
     latitude: float
     longitude: float
 
@@ -98,9 +97,9 @@ class StereoProjector(object):
         )
 
         ax.set_title("Skychart", va='bottom', fontsize=14, pad=20)
-        # ax.set_xlabel("Angle (θ)", labelpad=15)
+        ax.set_xlabel("Angle (θ)", labelpad=15)
         ax.grid(False)
-        ax.set_xticks([])
+        # ax.set_xticks([])
         ax.set_yticks([])
         ax.set_ylim((0.0, 2.0))
 

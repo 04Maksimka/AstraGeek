@@ -1,6 +1,7 @@
 """Module with astronomical geometrical functions."""
-import dateutil.tz
+
 from stereographic_projection.hip_catalog.hip_catalog import Star
+from stereographic_projection.helpers.time import vequinox_hour_angle
 from numpy.typing import NDArray
 import numpy as np
 from dataclasses import dataclass
@@ -47,11 +48,11 @@ def get_horizontal_coords(config: dict, catalog_data: NDArray[Star]):
     """
     eci_coords = np.array([np.array(list(star.eci_coords)) for star in catalog_data]).T
 
-    # Shift from UTC
-    timeshift = config['longitude'] * 3600 / 15.0
-
-    # Just time from 1970-1-1
-    sidereal_time = config['utc_time'].replace(tzinfo=dateutil.tz.tzoffset(None, timeshift)).timestamp() * np.pi / (12 * 3600)
+    # Calculate local sidereal time
+    sidereal_time = vequinox_hour_angle(
+        longitude=config['longitude'],
+        local=config['local_time']
+    )
 
     # Rotate ECI (XYZ) to "cartesian" equatorial system (X'Y'Z'),
     # so Z' is directed to the North celestial pole, X' --- to the West point

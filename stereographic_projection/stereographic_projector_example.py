@@ -23,7 +23,16 @@ def stars_with_logo(figure, need_pdf: bool = False):
 
 
 if __name__ == "__main__":
-    cfg = StereoProjConfig(add_ecliptic=True, utc_time=datetime(year=2021, month=3, day=1, hour=6), latitude=0, longitude=0)
+    cfg = StereoProjConfig(
+        add_ecliptic=True,
+        local_time=datetime(
+            year=2021,
+            month=3,
+            day=1,
+            hour=12
+        ),
+        latitude=45,
+        longitude=90)
     catalog = Catalog()
     proj = StereoProjector(cfg, catalog)
 
