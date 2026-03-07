@@ -205,7 +205,17 @@
   // ── Canvas setup ──────────────────────────────────────────────────────────
   const canvas = document.getElementById('sky-canvas');
   const ctx    = canvas.getContext('2d');
-  const CLICK_TOLERANCE = 16;
+
+  const IS_TOUCH = navigator.maxTouchPoints > 0;
+
+  function canvasScale() {
+    const rect = canvas.getBoundingClientRect();
+    return rect.width > 0 ? canvas.width / rect.width : 1;
+  }
+
+  function cssToCvs(cssPx) {
+    return cssPx * canvasScale();
+  }
 
   function resizeCanvas() {
     const w = canvas.parentElement.clientWidth;
@@ -223,11 +233,16 @@
   }
 
   function magToRadius(vMag) {
-    return Math.max(1.5, 7.5 - vMag * 0.9);
+    const base = Math.max(1.5, 7.5 - vMag * 0.9);
+    return IS_TOUCH ? base * 1.4 : base;
   }
 
   function hitRadius(star) {
-    return star.is_constellation ? Math.max(CLICK_TOLERANCE, magToRadius(star.v_mag) + 8) : 0;
+    if (!star.is_constellation) return 0;
+    // На тач-устройствах минимум 44 CSS-px, на десктопе 16 CSS-px
+    const minCssPx = IS_TOUCH ? 44 : 16;
+    const minCvsPx = cssToCvs(minCssPx);
+    return Math.max(minCvsPx, magToRadius(star.v_mag) + 8);
   }
 
   function starAtPos(mx, my) {
@@ -402,7 +417,8 @@
 
   // ── Edge detection ────────────────────────────────────────────────────────
   function findEdgeAtPos(mx, my) {
-    const tolerance = 8;
+    const toleranceCss = IS_TOUCH ? 22 : 8;
+    const tolerance = cssToCvs(toleranceCss);
     for (let i = 0; i < drawnEdges.length; i++) {
       const [a, b] = drawnEdges[i];
       const sa = stars.find(s => s.hip_id === a);
