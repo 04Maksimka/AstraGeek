@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"C:/Users/qweqw/OneDrive/Документы/GitHub/AstraGeek/lectures/cel_mech_history/scenes\")",
+      "Bash(mkdir -p \"C:/Users/qweqw/OneDrive/Документы/GitHub/AstraGeek/lectures/cel_mech_history/data\")",
+      "Bash(python -c \"from lectures.cel_mech_history.scenes.retrograde_motion import RetrogradeMotionScene; print\\(''Import OK''\\)\")",
+      "Bash(python -c \"from lectures.cel_mech_history.scenes.scene_utils import add_starfield, SUN_COLOR; print\\(f''Import OK, SUN={SUN_COLOR}''\\)\")",
+      "Bash(python -c \"from lectures.cel_mech_history.scenes.epicycles import _dft; import numpy as np; z = np.exp\\(2j*np.pi*np.arange\\(100\\)/100\\); c = _dft\\(z\\); freqs = [f for _,_,f in c[:5]]; print\\(f''DFT freqs top5: {freqs}''\\)\")",
+      "Bash(pip install:*)",
+      "Bash(pdflatex -interaction=nonstopmode lecture_slides.tex)",
+      "Bash(python -m manim render scenes/epicycles.py EpicycleScene -ql --disable_caching)",
+      "Bash(python -m manim render scenes/retrograde_motion.py RetrogradeMotionScene -ql --disable_caching)",
+      "Bash(findstr /i \"error rendered animation\")",
+      "Bash(timeout 120)",
+      "Bash(ping -n 90 127.0.0.1)",
+      "Bash(dir \"C:\\\\Users\\\\qweqw\\\\OneDrive\\\\Документы\\\\GitHub\\\\AstraGeek\\\\lectures\\\\cel_mech_history\\\\media\\\\videos\\\\retrograde_motion\\\\480p15\"\")"
+    ]
+  }
+}

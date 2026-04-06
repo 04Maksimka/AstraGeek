@@ -46,6 +46,7 @@ dev = [
     "pre-commit",
 ]
 web = ["flask"]
+lectures = ["manim>=0.18.0", "manim-slides>=5.0"]
 
 [tool.ruff]
 line-length = 79

@@ -1,0 +1,12 @@
+# This file is used internally by FFMPEG.
+file 'file:C:/Users/qweqw/OneDrive/Документы/GitHub/AstraGeek/media/videos/mercury_precession/480p15/partial_movie_files/MercuryPrecessionScene/1584795214_604088180_223132457.mp4'
+file 'file:C:/Users/qweqw/OneDrive/Документы/GitHub/AstraGeek/media/videos/mercury_precession/480p15/partial_movie_files/MercuryPrecessionScene/4072820271_3531056524_2384244623.mp4'
+file 'file:C:/Users/qweqw/OneDrive/Документы/GitHub/AstraGeek/media/videos/mercury_precession/480p15/partial_movie_files/MercuryPrecessionScene/4072820271_3500554460_2730970497.mp4'
+file 'file:C:/Users/qweqw/OneDrive/Документы/GitHub/AstraGeek/media/videos/mercury_precession/480p15/partial_movie_files/MercuryPrecessionScene/4072820271_4010645041_3000713532.mp4'
+file 'file:C:/Users/qweqw/OneDrive/Документы/GitHub/AstraGeek/media/videos/mercury_precession/480p15/partial_movie_files/MercuryPrecessionScene/4072820271_1753694811_1606089887.mp4'
+file 'file:C:/Users/qweqw/OneDrive/Документы/GitHub/AstraGeek/media/videos/mercury_precession/480p15/partial_movie_files/MercuryPrecessionScene/4072820271_2390846809_2243233126.mp4'
+file 'file:C:/Users/qweqw/OneDrive/Документы/GitHub/AstraGeek/media/videos/mercury_precession/480p15/partial_movie_files/MercuryPrecessionScene/4072820271_3779313687_1960193095.mp4'
+file 'file:C:/Users/qweqw/OneDrive/Документы/GitHub/AstraGeek/media/videos/mercury_precession/480p15/partial_movie_files/MercuryPrecessionScene/4072820271_3458538601_2560630109.mp4'
+file 'file:C:/Users/qweqw/OneDrive/Документы/GitHub/AstraGeek/media/videos/mercury_precession/480p15/partial_movie_files/MercuryPrecessionScene/4072820271_325719725_2378959940.mp4'
+file 'file:C:/Users/qweqw/OneDrive/Документы/GitHub/AstraGeek/media/videos/mercury_precession/480p15/partial_movie_files/MercuryPrecessionScene/4072820271_1610380323_2584601792.mp4'
+file 'file:C:/Users/qweqw/OneDrive/Документы/GitHub/AstraGeek/media/videos/mercury_precession/480p15/partial_movie_files/MercuryPrecessionScene/4072820271_1205166294_3096114390.mp4'

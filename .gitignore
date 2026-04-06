@@ -160,6 +160,7 @@ Desktop.ini
 *~
 *.swp
 *.npy
+*.mp4
 
 # Astronomy-specific (optional: ignore generated or large temporary data files if applicable)
 # e.g., *.fits (but only if they are generated; commit essential datasets)
