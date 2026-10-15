@@ -99,7 +99,6 @@ class ProjectionResult:
 
 @dataclass
 class ConstellationConfig(object):
-    """ """
 
     constellations_list: Optional[List[str]] = (
         None  # If None, render all available
